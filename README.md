@@ -4,92 +4,116 @@ A Bash-to-Go Transpiler that converts Bash scripts to idiomatic Go code.
 
 ## Overview
 
-bash2go is a tool that translates Bash scripts into Go programs, producing a compiled binary that replaces shell scripts. This provides better performance, portability, and maintainability than traditional shell scripts.
-
-## Design Goals
-
-- **Accurate Bash Translation**: Parse Bash syntax and convert it into idiomatic Go
-- **Go-Idiomatic Execution**: Use proper Go packages instead of raw `exec.Command` when possible
-- **Performance Optimized**: Compiled Go binaries execute significantly faster than interpreted shell scripts
-- **Portable & Secure**: No dependencies on Unix utilities; works across Linux, macOS, and Windows
-- **Extensible**: Support multiple levels of Bash features, from basic commands to complex control flow
-- **CLI-Driven**: Provide an intuitive CLI to convert scripts and optionally compile them
+bash2go is a tool that translates Bash scripts into Go programs, producing compiled binaries that replace shell scripts. This provides better performance, portability, and maintainability than traditional shell scripts.
 
 ## Features
 
-bash2go supports a range of Bash features including:
-
-- Basic command execution
-- Variable assignment and substitution
-- Function definitions and calls
-- Conditional statements (if, case)
-- Loops (for, while, until)
-- Pipes between commands
-- Subshells with isolated environment
-- Command substitution
+- Converts Bash scripts to idiomatic Go code
+- Handles common Bash constructs:
+  - Variable assignments and substitutions
+  - Command execution
+  - Control flow (if, for, while, until, case)
+  - Functions
+  - Pipes and redirections
+  - Subshells and background tasks
+- Generates standalone Go executables
 
 ## Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/TFMV/bash2go.git
-cd bash2go
-
-# Build the binary
-go build -o bash2go
+go install github.com/TFMV/bash2go@latest
 ```
 
 ## Usage
 
-### Converting a Bash script to Go source code
+### Converting a Bash script to Go
 
 ```bash
-bash2go convert script.sh -o output.go
+bash2go convert script.sh -o script.go
 ```
 
-### Converting and compiling to a binary
+### Building a Bash script directly to a binary
 
 ```bash
-bash2go build script.sh -o mybinary
-```
-
-### Running the compiled binary
-
-```bash
-./mybinary
+bash2go build script.sh -o script
 ```
 
 ## Examples
 
-The `examples` directory contains sample Bash scripts that demonstrate various features:
+### Simple Hello World
 
-- `simple.sh`: Basic Bash script with variables, functions, loops, and conditionals
-- `advanced.sh`: More complex script with pipes, subshells, and advanced features
+**hello.sh**:
+
+```bash
+#!/bin/bash
+echo "Hello, World!"
+```
+
+**Generated Go code**:
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+// Main function generated from Bash script
+func main() {
+    fmt.Println("Hello, World!")
+}
+```
+
+### More Complex Example
+
+**example.sh**:
+
+```bash
+#!/bin/bash
+NAME="World"
+echo "Hello, $NAME!"
+
+if [ -f "file.txt" ]; then
+    echo "File exists"
+else
+    echo "File does not exist"
+fi
+
+for i in 1 2 3; do
+    echo "Item $i"
+done
+```
 
 ## Project Structure
 
-```
-bash2go/
-│── cmd/                # CLI entry point
-│   ├── root.go         # Handles CLI commands
-│── parser/             # Handles Bash parsing & AST conversion
-│   ├── parse.go        # Parses Bash using mvdan/sh
-│   ├── ast.go          # Traverses AST & extracts components
-│── generator/          # Handles Go code generation
-│   ├── template.go     # Defines Go code templates
-│   ├── transpiler.go   # Converts AST to Go code
-│── compiler/           # Handles Go code compilation
-│   ├── build.go        # Runs go build
-│── examples/           # Sample Bash scripts & their Go output
-│── main.go             # CLI entrypoint
-│── go.mod              # Go module definition
+- `cmd/`: Command-line interface
+- `parser/`: Bash script parsing and AST building
+- `generator/`: Go code generation
+- `compiler/`: Go code compilation
+- `examples/`: Example Bash scripts and their Go equivalents
+
+## Development
+
+### Building from source
+
+```bash
+git clone https://github.com/TFMV/bash2go.git
+cd bash2go
+go build
 ```
 
-## Dependencies
+### Running tests
 
-- [mvdan.cc/sh/v3](https://github.com/mvdan/sh): Bash parser
-- [github.com/spf13/cobra](https://github.com/spf13/cobra): CLI framework
+```bash
+go test ./...
+```
+
+## Limitations
+
+- Not all Bash features are supported yet
+- Complex shell expansions may not translate perfectly
+- External command execution relies on the `gexe` library
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+[MIT License](LICENSE)
